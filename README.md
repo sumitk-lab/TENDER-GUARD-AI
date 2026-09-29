@@ -78,7 +78,7 @@ All figures below are strictly measured from the codebase and test runs:
 
 ## Demo Video
 
-- **Video Walkthrough**: [SATYAM Evaluation Walkthrough (SIH 2026 PS26100)](https://youtu.be/demo-satyam-sih26100)
+- **Video Walkthrough**: [SATYAM Evaluation Walkthrough (SIH 2026 PS26100)](https://www.youtube.com/watch?v=qkYpethYMGU)
 - Explains end-to-end tender ingestion, automated three-way reconciliation, cross-document inconsistency detection, compliance analysis report printing, and tamper-evident audit ledger verification.
 
 ---
