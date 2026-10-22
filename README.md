@@ -494,3 +494,5 @@ SATYAM is configured for continuous deployment on **Render** via `render.yaml`:
 ## License
 
 This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
+#   T E N D E R - G U A R D - A I  
+ 
