@@ -131,7 +131,7 @@ export function App() {
           <div className="flex flex-col items-center justify-center py-24 space-y-3">
             <RefreshCw className="w-8 h-8 text-teal-700 animate-spin" />
             <p className="text-xs font-bold uppercase tracking-wider text-slate-600">
-              Initializing SATYAM Platform & Simulated Government Registries...
+              Initializing TENDER GUARD-AI Platform & Simulated Government Registries...
             </p>
           </div>
         ) : (
@@ -229,7 +229,7 @@ export function App() {
             <StateEmblem size={32} inverted alt="Government of India" className="shrink-0" />
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-bold text-slate-200">SATYAM (सत्यम्)</span>
+                <span className="font-bold text-slate-200">TENDER GUARD-AI</span>
                 <span className="text-slate-500">•</span>
                 <span className="text-slate-300">GeM Procurement Compliance Intelligence</span>
               </div>

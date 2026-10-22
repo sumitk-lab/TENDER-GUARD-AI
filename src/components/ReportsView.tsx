@@ -369,7 +369,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
                   {activeBid.officerDecision?.officerDesignation || currentUser.designation}
                 </div>
                 <div className="text-[9px] text-slate-400 font-mono mt-0.5">
-                  Digitally Sealed via SATYAM Ledger
+                  Digitally Sealed via TENDER GUARD-AI Ledger
                 </div>
               </div>
               <div className="border-t border-slate-300 pt-2">

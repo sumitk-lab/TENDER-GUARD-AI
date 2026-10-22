@@ -164,7 +164,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <ShieldCheck className="w-4 h-4 text-teal-600" />
               <span>SIH 2026 PS 26100 • GeM Decision-Support</span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">SATYAM</h1>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">TENDER GUARD-AI</h1>
             <h2 className="text-sm font-semibold text-slate-600 mt-0.5">
               Procurement Compliance Intelligence & Verification Matrix
             </h2>

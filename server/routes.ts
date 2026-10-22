@@ -670,7 +670,7 @@ apiRouter.get('/docs', (req: Request, res: Response) => {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SATYAM API Documentation | OpenAPI 3.0</title>
+  <title>TENDER GUARD-AI API Documentation | OpenAPI 3.0</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
   <style>
     body { margin: 0; background: #fafafa; font-family: sans-serif; }

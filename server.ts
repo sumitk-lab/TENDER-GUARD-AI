@@ -43,7 +43,7 @@ async function startServer() {
   app.get('/api/health', (req, res) => {
     res.json({
       status: 'ok',
-      service: 'SATYAM (GeM Bid Compliance Verification Platform)',
+      service: 'TENDER GUARD-AI (GeM Bid Compliance Verification Platform)',
       version: '1.0.0',
       timestamp: new Date().toISOString(),
     });
@@ -68,10 +68,10 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[SATYAM] Government Procurement Verification Platform running on http://0.0.0.0:${PORT}`);
+    console.log(`[TENDER GUARD-AI] Government Procurement Verification Platform running on http://0.0.0.0:${PORT}`);
   });
 }
 
 startServer().catch((err) => {
-  console.error('Failed to start SATYAM server:', err);
+  console.error('Failed to start TENDER GUARD-AI server:', err);
 });

@@ -11,7 +11,7 @@ import { runPolicyEdgeCasesTests } from './unit/policy-edge-cases.test';
 
 async function main() {
   console.log('====================================================');
-  console.log('  SATYAM MONOREPO AUTOMATED TEST SUITE (   )');
+  console.log('  TENDER GUARD-AI MONOREPO AUTOMATED TEST SUITE');
   console.log('====================================================\n');
 
   console.log('--- 1. Compliance Core & Policy Engine Tests ---');

@@ -1,5 +1,5 @@
 export const APP_CONFIG = {
-  appName: 'SATYAM',
+  appName: 'TENDER GUARD-AI',
   version: '2.4.0',
   description: 'National Public Procurement Compliance Verification & Decision-Support System',
   statutoryStandard: 'General Financial Rules (GFR 2017) & GeM General Terms & Conditions (GTC v4.0)',

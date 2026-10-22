@@ -124,25 +124,25 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <div className="leading-tight">
                 <div className="flex items-center space-x-1.5">
-                  <span className="font-black text-base text-white tracking-tight">SATYAM</span>
-                  {/* Subtle Sanskrit Meaning Detail with Interactive Tooltip */}
+                  <span className="font-black text-base text-white tracking-tight">TENDER GUARD-AI</span>
+                  {/* AI Badge with Interactive Tooltip */}
                   <div className="relative group/satyam inline-block">
                     <span
                       tabIndex={0}
                       className="text-[10px] text-teal-300 font-medium px-1.5 py-0.5 rounded bg-teal-950/80 border border-teal-700/60 cursor-help flex items-center space-x-1"
                     >
-                      <span>सत्यम्</span>
+                      <span>AI-Powered</span>
                       <span className="text-slate-500">•</span>
-                      <span>Truth</span>
+                      <span>Trust</span>
                     </span>
                     {/* Tooltip on Hover / Focus */}
                     <div className="absolute left-0 top-full mt-1.5 hidden group-hover/satyam:block group-focus/satyam:block z-50 w-64 p-3 bg-slate-900 text-slate-200 text-xs rounded-xl shadow-2xl border border-slate-700 pointer-events-none">
                       <div className="font-bold text-slate-100 flex items-center justify-between">
-                        <span>SATYAM (सत्यम्)</span>
-                        <span className="text-[10px] text-teal-400 font-mono">Sanskrit: Truth</span>
+                        <span>TENDER GUARD-AI</span>
+                        <span className="text-[10px] text-teal-400 font-mono">GeM Platform</span>
                       </div>
                       <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-                        Named for the foundational principle of truthful, transparent, and evidence-based procurement verification.
+                        AI-Powered Integrated Bid Compliance Verification & Decision-Support Platform for GeM Procurement.
                       </p>
                     </div>
                   </div>

@@ -9,6 +9,7 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        'react-is': path.resolve(__dirname, 'src/lib/react-is-shim.ts'),
       },
     },
     server: {
