@@ -1,498 +1,977 @@
-# SATYAM
+# TENDER GUARD AI
 
 ### Truth • Transparency • Trust in Public Procurement
 
-> **SATYAM** (*सत्यम्*) is an evidence-driven, policy-as-code bid compliance verification and decision-support platform engineered for the Government e-Marketplace (GeM) ecosystem under General Financial Rules (GFR 2017) Rule 144.
+**Tender Guard AI** is an evidence-driven, policy-as-code bid compliance verification and decision-support platform designed for the Government e-Marketplace (GeM) ecosystem under General Financial Rules (GFR 2017) Rule 144.
 
-[![Build](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/maitray-agrawal/Satyam)
-[![Tests](https://img.shields.io/badge/Automated%20Tests-82%2F82%20Passed%20(100%25)-emerald.svg)](./docs/audit/test-report.md)
-[![Docker](https://img.shields.io/badge/Docker-Multi--Stage%20Verified-blue.svg)](./Dockerfile)
+The platform helps procurement teams analyze tender requirements, examine bidder documents, identify compliance gaps, reconcile conflicting evidence, and generate traceable compliance reports. It combines AI-assisted document extraction with deterministic policy evaluation and human oversight.
+
+[![Build](https://img.shields.io/badge/Build-Verify%20Locally-blue.svg)](https://github.com/sumitk-lab/TENDER-GUARD-AI)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Stage-blue.svg?logo=docker)](./Dockerfile)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
-[![Deployment](https://img.shields.io/badge/Deployment-Render%20Web%20Service-informational.svg)](https://satyam-app.onrender.com/)
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Problem Statement](#problem-statement)
+- [Our Solution](#our-solution)
+- [Key Features](#key-features)
+- [Three-Way Evidence Reconciliation](#three-way-evidence-reconciliation)
+- [End-to-End Workflow](#end-to-end-workflow)
+- [Compliance Scoring and Risk Classification](#compliance-scoring-and-risk-classification)
+- [AI Architecture and Governance](#ai-architecture-and-governance)
+- [Verification Adapters](#verification-adapters)
+- [Evidence Provenance](#evidence-provenance)
+- [Tamper-Evident Audit Ledger](#tamper-evident-audit-ledger)
+- [Security](#security)
+- [Technology Stack](#technology-stack)
+- [System Architecture](#system-architecture)
+- [Repository Structure](#repository-structure)
+- [Installation and Local Setup](#installation-and-local-setup)
+- [Environment Configuration](#environment-configuration)
+- [Running the Application](#running-the-application)
+- [API Health Check](#api-health-check)
+- [Testing and Type Checking](#testing-and-type-checking)
+- [Docker Deployment](#docker-deployment)
+- [Cloud Deployment](#cloud-deployment)
+- [Limitations and Disclosures](#limitations-and-disclosures)
+- [Future Enhancements](#future-enhancements)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Project Overview
+
+Government procurement involves evaluating large volumes of documents against tender-specific eligibility conditions, financial requirements, statutory registrations, and technical specifications.
+
+Tender Guard AI is designed to assist procurement officers by bringing these checks into a unified digital workflow.
+
+Instead of relying exclusively on manual document inspection, the platform organizes evidence, applies defined compliance rules, highlights inconsistencies, and provides an auditable basis for human review.
+
+### Project Objectives
+
+- Reduce repetitive manual compliance checks.
+- Identify missing, inconsistent, or potentially invalid bidder information.
+- Compare tender requirements with submitted documentary evidence.
+- Support consistent application of procurement policies.
+- Improve traceability through evidence-linked findings and audit records.
+- Help procurement officers make informed decisions without replacing their statutory authority.
+
+### Intended Users
+
+- Procurement officers and tender evaluation committees.
+- Government purchasing departments.
+- Compliance and contract-management teams.
+- Organizations participating in public procurement.
+- Developers building procurement automation and compliance systems.
 
 ---
 
 ## Problem Statement
 
-**Smart India Hackathon (SIH 2026) — Problem Statement SIH26100**
-*"AI-Powered Integrated Bid Compliance Verification Platform for GeM Procurement"*
+**Smart India Hackathon 2026 — Problem Statement SIH26100**
 
-In government procurement across GeM and Central Public Procurement Portal (CPPP), evaluation committees face high scrutiny backlogs. Tender evaluation committees (TECs) must verify dozens of complex clauses (GSTN validity, PAN entity matching, Udyam MSME status, Make in India local content declarations, OEM authorization codes, and Central Debarment lists) across hundreds of multi-page technical dossiers within strict statutory deadlines.
+*AI-Powered Integrated Bid Compliance Verification Platform for GeM Procurement.*
 
-Manual scrutiny causes:
-1. **Prolonged Tender Cycles**: Weeks of manual document inspection across disparate government portals.
-2. **Scrutiny Fatigue & Human Error**: Inadvertent oversight of expired registrations or forged certificates.
-3. **Cross-Document Contradictions**: Inability to systematically cross-reference identity tokens (e.g., PAN embedded inside GSTIN vs PAN card vs financial audit reports).
-4. **Collusion & Debarment Evasion**: Bidders evading blacklisting through altered trade names or sister consortiums.
+In public procurement workflows involving the Government e-Marketplace (GeM) and Central Public Procurement Portal (CPPP), tender evaluation committees may need to inspect extensive technical and financial documentation within strict deadlines.
 
----
+Examples of checks include:
 
-## Solution
+- GST registration and taxpayer details.
+- PAN and legal-entity consistency.
+- Udyam MSME registration and applicable exemptions.
+- Make in India local-content declarations.
+- Original Equipment Manufacturer (OEM) authorization.
+- Employee-related statutory registrations, where applicable.
+- Corporate registration and business status.
+- Debarment and blacklisting concerns.
 
-SATYAM automates statutory compliance evaluation through a **deterministic policy-as-code engine**, **multi-document evidence extraction**, and **thirteen (13) statutory verification adapters**. Rather than trusting bidder claims or relying on unexplainable black-box AI scores, SATYAM cross-examines evidence across three independent planes to generate reproducible 0–100 compliance scores, granular risk classifications (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), and a cryptographically tamper-evident SHA-256 audit ledger. Final statutory decision authority remains with authorized procurement officers.
+### Challenges with Manual Evaluation
 
----
+**1. Prolonged tender evaluation**
 
-## Why SATYAM
+Reviewing many documents and cross-checking information across different sources can increase evaluation time.
 
-The core architectural innovation of SATYAM is **Three-Way Evidence Reconciliation**:
+**2. Human error**
 
-$$\begin{aligned}
-&\text{1. Tender Requirement} && \text{(Mandated RFP clause, eligibility threshold, minimum local content)} \\
-+\quad &\text{2. Bidder Document Evidence} && \text{(OCR-extracted tokens, certificate IDs, declared values, page citations)} \\
-+\quad &\text{3. Independent Verification Data} && \text{(Statutory registry status from GSTN, ITD, Udyam, EPFO, Debarment)} \\
-\hline
-=\quad &\mathbf{Three\text{-}Way\ Evidence\ Reconciliation} && \mathbf{(Cryptographically\ logged\ factual\ determination)}
-\end{aligned}$$
+Expired documents, missing certificates, and inconsistent identifiers may be overlooked during repetitive manual checks.
 
-If a bidder submits a valid certificate but the statutory registry shows debarment or invalid registration, SATYAM detects the conflict immediately, penalizes the score, and elevates the risk tier with complete evidence provenance.
+**3. Cross-document contradictions**
 
----
+The same business identifier or legal name may appear differently across registration documents, declarations, and financial records.
 
-## Key Results (Measured)
+**4. Difficult evidence traceability**
 
-All figures below are strictly measured from the codebase and test runs:
+A reviewer may need to locate the exact document, page, and statement supporting a particular compliance finding.
 
-| Metric | Result | Source / Verification |
-|---|---:|---|
-| **Automated Tests** | **82 / 82** | `bun run test` (8 comprehensive test suites) |
-| **Test Pass Rate** | **100.0%** | All assertions passing ([Test Report](./docs/audit/test-report.md)) |
-| **Test Suite Runtime** | **634.85 ms** | Sub-second test execution ([Performance Report](./docs/audit/performance.md)) |
-| **Verification Adapters** | **13 Registered** | GST, PAN, Udyam, EPFO, ESIC, ITR, Startup India, NSIC, OEM, Debarment, MII, MCA21, DigiLocker |
-| **Demonstration Scenarios** | **9 Pre-Seeded** | Fully compliant, OEM discrepancy, MII shortfall, Blacklisted, MSME exemption |
-| **Audit Ledger Verification** | **PASS (31/31 Logs)** | `GET /api/audit-logs/verify` (Cryptographic SHA-256 chain intact) |
-| **TypeScript Typecheck** | **PASS (0 Errors)** | `tsc --noEmit` validation |
-| **Production Build** | **PASS (8.34s)** | Client SPA (Vite) + Server CJS bundle (esbuild) |
-| **API Health Latency** | **0.98 ms (Median)** | Measured over 5 consecutive requests ([Performance Report](./docs/audit/performance.md)) |
+**5. Potential debarment evasion**
+
+Entities using altered trade names or related business identities may require additional scrutiny during procurement checks.
+
+Tender Guard AI is designed to address these challenges through structured evidence extraction, rule-based evaluation, and transparent review workflows.
 
 ---
 
-## Live Demo
+## Our Solution
 
-- **Demonstration URL**: [https://satyam-app.onrender.com/](https://satyam-app.onrender.com/)
-- **Environment**: *Controlled Demonstration Environment*
-- **Default Evaluation Profile**: Director (Procurement & Contracts), Ministry of Electronics & IT (MeitY)
+Tender Guard AI combines three major capabilities:
+
+1. **AI-assisted document processing** to extract candidate information from tender and bidder documents.
+2. **Deterministic policy-as-code evaluation** to apply explicit compliance rules and scoring logic.
+3. **Evidence reconciliation and auditability** to document discrepancies and preserve a traceable history of system actions.
+
+The intended output includes compliance findings, a normalized score where supported by the configured rules, a risk classification, and evidence that helps reviewers understand each result.
+
+The platform is designed as a decision-support system. Final procurement decisions remain the responsibility of authorized human officers.
 
 ---
 
-## Demo Video
+## Key Features
 
-- **Video Walkthrough**: [SATYAM Evaluation Walkthrough (SIH 2026 PS26100)](https://www.youtube.com/watch?v=qkYpethYMGU)
-- Explains end-to-end tender ingestion, automated three-way reconciliation, cross-document inconsistency detection, compliance analysis report printing, and tamper-evident audit ledger verification.
+### 1. Tender Requirement Analysis
+
+Organizes tender eligibility conditions, mandatory documents, financial thresholds, and technical requirements into structured checks.
+
+### 2. Multi-Document Evidence Extraction
+
+Processes supported document formats to identify relevant text, identifiers, certificate information, and declared values.
+
+AI-assisted extraction may use a configured Google Gemini integration, with a deterministic fallback where implemented.
+
+### 3. Three-Way Evidence Reconciliation
+
+Compares tender requirements, bidder submissions, and independent or configured verification data to highlight agreements and discrepancies.
+
+### 4. Policy-Based Compliance Scoring
+
+Applies configured rules and weights to generate a compliance score. Mandatory conditions and statutory exemptions can receive special treatment according to the implemented policy.
+
+### 5. Risk Classification
+
+Supports the following risk categories where configured:
+
+- `LOW`
+- `MEDIUM`
+- `HIGH`
+- `CRITICAL`
+
+### 6. Verification Adapters
+
+Organizes checks for statutory registrations, business identity, eligibility declarations, and other procurement-related information.
+
+**Important:** Adapters operating in demonstration mode do not constitute live verification by the corresponding government authority.
+
+### 7. Evidence Provenance
+
+Links compliance findings to source documents, extracted text, page references, and associated metadata where available.
+
+### 8. Audit Logging
+
+Records important state-changing operations and supports integrity verification through a SHA-256 hash-chained audit ledger.
+
+### 9. Officer Review
+
+Supports human review of evidence, findings, and compliance reports before a final procurement decision.
+
+### 10. Compliance Reporting
+
+Provides a structured view of findings intended to help reviewers understand why a requirement passed, failed, or needs further investigation.
 
 ---
 
-## Screenshots
+## Three-Way Evidence Reconciliation
 
-All screenshots below are captured directly from the running production build at 1440×900 Retina resolution:
+The core concept behind Tender Guard AI is **Three-Way Evidence Reconciliation**.
 
-### 1. Command Center & Procurement Overview
-![Command Center](./docs/screenshots/01-command-center.png)
-*Central dashboard displaying active GeM tenders, ingested bidder compliance matrix, real-time KPI metrics, and high-priority officer review queue.*
+A compliance determination should not depend on a bidder's declaration alone. It should consider the applicable tender requirement, the evidence submitted, and any independent verification data that is available.
 
-### 2. Tender Catalog & Ruleset Intelligence
-![Tender Requirements](./docs/screenshots/02-tender-requirements.png)
-*Automated RFP clause extraction and configurable policy-as-code scoring weights under GFR 2017 Rule 144.*
+The three evidence planes are:
 
-### 3. Bidder Compliance & Verification Dossier
-![Bidder Dossier](./docs/screenshots/03-bidder-dossier.png)
-*Comprehensive multi-document dossier aggregating bidder financial metrics, statutory registrations, and compliance checks.*
+**1. Requirement Plane**
 
-### 4. Three-Way Evidence Reconciliation
-![Three-Way Reconciliation](./docs/screenshots/04-three-way-reconciliation.png)
-*Automated triangulation comparing tender requirements, bidder document submissions, and independent statutory registry data.*
+The applicable tender clause, eligibility condition, financial threshold, or local-content requirement.
 
-### 5. Compliance Analysis Report (A4 Print-Ready)
-![Compliance Analysis Report](./docs/screenshots/05-compliance-analysis.png)
-*Official Technical Evaluation Committee (TEC) compliance report featuring bidder particulars, requirement breakdown, Back to Dossier navigation, and print stylesheet.*
+**2. Bidder Evidence Plane**
 
-### 6. Evidence Provenance & Document Extraction
-![Evidence Provenance](./docs/screenshots/06-evidence-provenance.png)
-*Verifiable evidence trail linking compliance findings directly to source document SHA-256 hash, page number, bounding excerpt, and confidence score.*
+The bidder's documents, extracted identifiers, declarations, certificate details, and supporting statements.
 
-### 7. Officer Decision & Statutory Justification
-![Officer Decision](./docs/screenshots/07-officer-decision.png)
-*Human-in-the-loop decision interface requiring authenticated officer designation, conditional stipulations, and minimum 10-character statutory justification.*
+**3. Verification Plane**
 
-### 8. Tamper-Evident Cryptographic Audit Ledger
-![Audit Ledger](./docs/screenshots/08-audit-ledger.png)
-*Forward-chained SHA-256 audit ledger verifying system state transitions from genesis block to current head with instant mathematical verification.*
+Data from an independent registry or authorized verification source, when available. In demonstration mode, this plane may contain simulated data.
+
+### Example: Make in India Local Content
+
+Suppose a hypothetical tender requires at least 50% local content for a particular supplier classification.
+
+A bidder declares 42% local content.
+
+| Evidence | Example value |
+|---|---|
+| Tender requirement | Minimum 50% |
+| Bidder declaration | 42% |
+| Verification result | Requires independent confirmation |
+| Preliminary finding | Below declared threshold |
+| Suggested action | Flag for officer review |
+
+The difference between the required threshold and the bidder's declaration is identifiable without AI making the final legal decision.
+
+The configured rules can flag the discrepancy, explain the relevant condition, and preserve supporting evidence.
+
+Actual eligibility consequences depend on the tender terms, applicable policy, and verified facts.
 
 ---
 
 ## End-to-End Workflow
 
+The intended processing workflow is:
+
 ```mermaid
 flowchart TD
-    TENDER["1. Tender Ingestion & RFP Parsing"]
-    BID["2. Bidder Dossier Submission"]
-    EXTRACT["3. Multi-Document Token Extraction"]
-    REGISTRY["4. 13 Statutory Verification Adapters"]
-    RECON["5. Three-Way Evidence Reconciliation"]
-    COMPLIANCE["6. Deterministic Policy Engine (0-100 Score)"]
-    RISK["7. Risk Tiering (LOW / MEDIUM / HIGH / CRITICAL)"]
-    OFFICER["8. Officer Review & Human-in-the-Loop Decision"]
-    AUDIT["9. SHA-256 Hash-Chained Audit Ledger"]
+    A["1. Tender Ingestion"]
+    B["2. Bidder Document Submission"]
+    C["3. Document and Token Extraction"]
+    D["4. Verification Adapters"]
+    E["5. Three-Way Evidence Reconciliation"]
+    F["6. Deterministic Compliance Evaluation"]
+    G["7. Risk Classification"]
+    H["8. Officer Review"]
+    I["9. Decision and Justification"]
+    J["10. Audit Ledger"]
 
-    TENDER --> BID
-    BID --> EXTRACT
-    EXTRACT --> REGISTRY
-    EXTRACT --> RECON
-    REGISTRY --> RECON
-    RECON --> COMPLIANCE
-    COMPLIANCE --> RISK
-    RISK --> OFFICER
-    OFFICER --> AUDIT
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
 ```
 
----
+### Workflow Explanation
 
-## Three-Way Reconciliation
+1. **Tender ingestion:** The system receives tender information and applicable requirements.
+2. **Bidder submission:** Relevant bidder documents are uploaded for analysis.
+3. **Extraction:** Supported files are processed to identify evidence and important fields.
+4. **Verification:** Configured adapters evaluate relevant registration or eligibility information.
+5. **Reconciliation:** The extracted evidence is compared against the requirements and verification results.
+6. **Compliance evaluation:** The rules engine evaluates applicable checks.
+7. **Risk classification:** Findings are organized into configured risk categories.
+8. **Officer review:** An authorized reviewer examines the findings and supporting evidence.
+9. **Decision:** The authorized officer records the decision and required justification.
+10. **Audit:** The system records applicable actions in its audit trail.
 
-In conventional procurement systems, verification is binary and isolated: an officer manually verifies if a PDF is attached. SATYAM executes automated three-way triangulation:
-
-1. **Requirement Plane**: Mandate defined in tender ruleset (e.g. `MII-LOCAL-CONTENT: Minimum 50% for Class-I Local Supplier`).
-2. **Bidder Evidence Plane**: Declared value extracted from bidder affidavit (e.g. `Bharat Electro declared local content: 42%`).
-3. **External Verification Plane**: Registry data from DPIIT / Class-I verification adapter (`Requires >= 50%`).
-
-**Outcome**: Flagged as `NON_COMPLIANT`, severity `HIGH`, score penalized to `0`, and documented in the reconciliation matrix with exact citations.
-
----
-
-## Deterministic Compliance Engine
-
-Compliance evaluation in SATYAM is strictly **deterministic policy-as-code**:
-
-- **Mathematical Normalization**:
-  $$\text{Normalized Score} = \left( \frac{\sum \text{Earned Weights}}{\sum \text{Applicable Weights}} \right) \times 100$$
-- **Mandatory Requirements**: Missing mandatory documents (e.g. OEM Authorization Form) immediately cap or penalize the score and elevate the risk tier.
-- **Statutory Exemptions**: Valid MSME (Udyam) or Startup India registrations automatically evaluate exemption clauses (e.g. EMD waiver, prior turnover relaxation) to `EXEMPTED` without penalizing the overall score.
-- **Debarment Override**: Entities flagged on the Central Debarment List are assigned `CRITICAL` risk and score capped $\le 18/100$, triggering mandatory disqualification flags.
+The exact behavior of each step depends on the code, configured integrations, and available data.
 
 ---
 
-## Evidence & Provenance
+## Compliance Scoring and Risk Classification
 
-Every evaluated check maintains an auditable evidence pointer:
-- **Source Document ID & Name**: e.g., `doc-pan-card.pdf`
-- **SHA-256 File Hash**: Cryptographic hash verifying document authenticity at upload time
-- **Page Number**: Exact document page where the claim was located
-- **Text Excerpt**: Verbatim text token extracted from the file
-- **Extraction Confidence**: Numerical confidence percentage (e.g., `98.5%`)
+Tender Guard AI is designed to use explicit, reproducible rules rather than relying exclusively on an opaque AI-generated score.
+
+A weighted compliance score can be expressed as:
+
+\[
+\text{Score} =
+\frac{\text{Earned Applicable Weights}}
+{\text{Total Applicable Weights}}
+\times 100
+\]
+
+For example, if a bidder earns 72 out of 90 applicable weighted points:
+
+\[
+\text{Score} = \frac{72}{90}\times100 = 80
+\]
+
+The resulting score is 80 out of 100.
+
+### Mandatory Requirements
+
+Some conditions may be mandatory and cannot be treated like ordinary weighted checks. Depending on the configured policy, a missing mandatory document or failed eligibility condition may cap the score, trigger a finding, or require escalation.
+
+### Statutory Exemptions
+
+Where the applicable tender and law permit exemptions, the system should evaluate whether a bidder qualifies rather than automatically penalizing the bidder for an exempted condition.
+
+### Risk Classification
+
+Risk categories help prioritize review, but the thresholds and consequences must be defined by the implemented rules and applicable procurement policy.
+
+A risk label or numeric score alone does not establish fraud, legal ineligibility, or grounds for disqualification.
 
 ---
 
-## Tamper-Evident Audit Ledger
+## AI Architecture and Governance
 
-SATYAM records all state-changing operations in a cryptographically forward-chained ledger using SHA-256:
+Tender Guard AI separates AI-assisted extraction from deterministic compliance evaluation and authorized human decision-making.
 
-$$\text{Hash}_n = \text{SHA-256}(\text{Hash}_{n-1} \parallel \text{Timestamp} \parallel \text{EventType} \parallel \text{EntityId} \parallel \text{UserId} \parallel \text{UserRole} \parallel \text{ActionSummary} \parallel \text{MetadataJson})$$
-
-### Chain Structure Example
-```json
-{
-  "id": "log-001",
-  "previousHash": "GENESIS",
-  "currentHash": "a1b2c3d4e5f6...",
-  "eventType": "TENDER_CREATED",
-  "timestamp": "2026-09-23T10:00:00.000Z",
-  "userId": "usr-1",
-  "userRole": "PROCUREMENT_OFFICER"
-}
+```text
++---------------------------------------------------+
+|                AI Advisory Layer                  |
+|                                                   |
+|  - Document text and field extraction             |
+|  - Candidate clause identification                |
+|  - Advisory assistance, where configured          |
+|  - Deterministic fallback, where implemented      |
++------------------------+--------------------------+
+                         |
+                         v
++---------------------------------------------------+
+|           Deterministic Policy Engine             |
+|                                                   |
+|  - Explicit eligibility rules                    |
+|  - Compliance scoring                            |
+|  - Exemption handling                             |
+|  - Risk classification                            |
+|  - Evidence-based discrepancy flags              |
++------------------------+--------------------------+
+                         |
+                         v
++---------------------------------------------------+
+|             Authorized Human Review               |
+|                                                   |
+|  - Examine findings and evidence                  |
+|  - Request clarification or further verification  |
+|  - Record statutory justification                 |
+|  - Make the final authorized decision             |
++---------------------------------------------------+
 ```
 
-Any modification, deletion, or reordering of database rows breaks the cryptographic chain and is detected by `GET /api/audit-logs/verify`.
+### AI Responsibilities
 
----
+AI may assist with extracting text, identifying relevant clauses, and organizing candidate evidence.
 
-## AI Architecture & Governance Boundaries
+Extracted information can be incomplete or incorrect and should be validated where necessary.
 
-SATYAM maintains a strict governance boundary between AI assistance and legal decision authority:
+### Policy Engine Responsibilities
 
-```
-┌────────────────────────────────────────────────────────┐
-│                   AI Advisory Layer                    │
-│   • Multi-Document OCR & Clause Token Extraction       │
-│   • Advisory Co-pilot Q&A Assistant                    │
-│   • Deterministic Fallback Provider (Zero External AI) │
-└──────────────────────────┬─────────────────────────────┘
-                           │ Outputs Structured Candidates
-┌──────────────────────────▼─────────────────────────────┐
-│             Deterministic Policy Engine                │
-│   • GFR 2017 Rule 144 Mathematical Scoring (0-100)     │
-│   • Debarment & Disqualification Hard Rules            │
-│   • Statutory MSME / Startup Exemption Engine          │
-└──────────────────────────┬─────────────────────────────┘
-                           │ Generates Audit Dossier
-┌──────────────────────────▼─────────────────────────────┐
-│            Authorized Procurement Officer              │
-│   • Reviews Evidence & Three-Way Reconciliation        │
-│   • Supplies Statutory Justification (Min 10 chars)    │
-│   • Enters Final Legally Binding Decision              │
-└────────────────────────────────────────────────────────┘
-```
+The policy engine applies explicit rules to structured inputs. It provides a more reproducible basis for evaluation than allowing a generative model to determine compliance without defined criteria.
 
-- **AI assists extraction and advisory review.**
-- **Deterministic policy code evaluates compliance rules.**
-- **Authorized human procurement officers make all final decisions.**
+### Human Responsibilities
+
+Authorized officers remain responsible for reviewing the evidence, resolving material uncertainty, applying the relevant procurement rules, and making final decisions.
+
+AI-generated suggestions should not independently determine a legally binding procurement outcome.
 
 ---
 
 ## Verification Adapters
 
-| Verification Registry | Current Demonstration Mode | Production Integration Specification |
-|---|---|---|
-| **GSTN** | Simulated realistic taxpayer status & return frequency | Direct GST Suvidha Provider (GSP) REST API |
-| **Income Tax (PAN)** | Simulated entity name & active PAN matching | NSDL / UTIITSL PAN Verification API |
-| **Udyam MSME** | Simulated enterprise tier (Micro/Small/Medium) | Ministry of MSME Udyam Portal API |
-| **Central Debarment** | Simulated CPPP / GeM blacklisting database | CPPP Debarment Registry & GeM Incident Management API |
-| **Make In India (MII)** | Simulated local content percentage validator | DPIIT Portal & Chartered Accountant digital signature validation |
-| **OEM Authorization** | Simulated Manufacturer Authorization Form (MAF) verification | Registered OEM direct verification API |
-| **EPFO** | Simulated establishment code & ECR compliance | EPFO Unified Portal Employer API |
-| **ESIC** | Simulated employer code verification | ESIC Shram Suvidha Portal API |
-| **Startup India** | Simulated DIPP recognition certificate verification | DPIIT Startup India Recognition Portal |
-| **MCA21** | Simulated CIN & company active status | Ministry of Corporate Affairs MCA21 V3 API |
-| **DigiLocker** | Simulated government document certificate validity | National DigiLocker API Gateway (MeitY) |
+The original project documentation describes adapters for the following verification categories.
 
-*All simulated adapters in demonstration mode return explicit `simulated: true` flags and simulation notices in API responses.*
+| Adapter | Purpose | Demonstration-mode disclosure |
+|---|---|---|
+| GSTN | GST registration and taxpayer information | Simulated verification |
+| PAN / Income Tax | Identity and legal-entity matching | Simulated verification |
+| Udyam MSME | MSME registration and enterprise classification | Simulated verification |
+| Central Debarment | Debarment or blacklisting checks | Simulated verification |
+| Make in India | Local-content declaration checks | Simulated verification |
+| OEM Authorization | Manufacturer authorization checks | Simulated verification |
+| EPFO | Establishment and employee-related compliance | Simulated verification |
+| ESIC | Employer registration checks | Simulated verification |
+| Startup India | Startup recognition checks | Simulated verification |
+| MCA21 | Corporate registration and company status | Simulated verification |
+| DigiLocker | Government document validation | Simulated verification |
+| ITR | Income-tax return-related checks | Confirm actual adapter configuration |
+| NSIC | Registration and eligibility-related checks | Confirm actual adapter configuration |
+
+The original README describes 13 registered adapters. The table lists the named verification categories documented in that source; verify the source code before asserting the complete adapter count or the live status of each integration.
+
+### Demonstration and Production Modes
+
+**Demonstration mode** allows development and testing with simulated responses. It does not establish that a real government registry has been contacted.
+
+**Production mode** requires the appropriate institutional onboarding, API credentials, authorization, data-handling controls, and integration testing.
+
+Responses from simulated adapters should be clearly labeled so that users cannot confuse them with authoritative registry results.
+
+---
+
+## Evidence Provenance
+
+Evidence provenance explains how a compliance finding was produced and where its supporting information originated.
+
+Where implemented, a finding may include:
+
+- Source document ID and filename.
+- Document hash.
+- Page number or source location.
+- Extracted text excerpt.
+- Extraction confidence.
+- Associated compliance rule.
+- Verification result.
+- Reviewer action and timestamp.
+
+### Example Evidence Record
+
+```json
+{
+  "documentId": "doc-example-001",
+  "fileName": "bidder-registration.pdf",
+  "pageNumber": 2,
+  "field": "registrationNumber",
+  "extractedValue": "EXAMPLE-12345",
+  "confidence": 0.985
+}
+```
+
+This is an illustrative data structure, not a claim about the exact API schema implemented in the repository.
+
+A document hash can help detect whether the file's bytes have changed since hashing. It does not independently prove that the document was issued by a legitimate authority.
+
+---
+
+## Tamper-Evident Audit Ledger
+
+An audit ledger records significant system events so that later reviewers can examine the sequence of actions.
+
+The original project describes a SHA-256 hash-chained ledger in which each entry incorporates the preceding entry's hash and relevant event data.
+
+A simplified conceptual formula is:
+
+\[
+H_n = \operatorname{SHA256}(H_{n-1}\parallel E_n)
+\]
+
+Where:
+
+- \(H_n\) is the current entry's hash.
+- \(H_{n-1}\) is the preceding entry's hash.
+- \(E_n\) represents the canonicalized event data.
+- \(\parallel\) denotes concatenation.
+
+### Illustrative Audit Entry
+
+```json
+{
+  "id": "log-example-001",
+  "previousHash": "GENESIS",
+  "currentHash": "example-hash",
+  "eventType": "TENDER_CREATED",
+  "timestamp": "2026-10-22T10:00:00.000Z",
+  "userId": "example-user",
+  "userRole": "PROCUREMENT_OFFICER"
+}
+```
+
+The values above are examples and are not actual audit records.
+
+### Why Hash Chaining Matters
+
+If an existing event is modified without updating the dependent hashes, a correctly implemented verification process should detect an integrity mismatch.
+
+However, a hash chain alone does not guarantee that an administrator cannot rewrite the entire ledger. Stronger assurance may require independently protected keys, external checkpoints, restricted write access, and durable immutable storage.
 
 ---
 
 ## Security
 
-Verified security controls implemented in code:
-- **HTTP Security Headers**: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block`, `Strict-Transport-Security`, `Referrer-Policy: strict-origin-when-cross-origin`.
-- **Upload Hardening**: Enforced 15MB file size ceiling, MIME validation (`application/pdf`, `image/png`, `image/jpeg`), and path traversal neutralization using random hex identifiers (`doc-${Date.now()}-${randomBytes(8)}.ext`).
-- **Role-Based Access Control (RBAC)**: Mutating actions restricted to `PROCUREMENT_OFFICER` and `ADMIN` roles.
-- **SQL Injection Defense**: Parameterized queries across all SQLite interactions.
-- **Input Validation**: Strict Zod schemas validating GSTIN, PAN, and officer justification fields.
+The original project documentation describes several security controls. Confirm each control against the current source code before treating it as verified in the renamed project.
 
----
+### HTTP Security
 
-## Architecture Diagram
+Security headers can reduce certain browser-based risks, including MIME-type confusion and unauthorized framing.
 
-```mermaid
-graph TD
-    subgraph Client ["Frontend Client (React 19 + Vite 6)"]
-        UI["Procurement Command Center"]
-        Dossier["Bidder Dossier & 3-Way Recon Matrix"]
-        Report["Compliance Analysis Report (A4 Print)"]
-        AuditUI["Cryptographic Audit Ledger View"]
-    end
+### Upload Validation
 
-    subgraph Server ["Backend Application (Express 4 + TypeScript)"]
-        Gateway["API Gateway & Security Headers Middleware"]
-        Auth["RBAC & Role Verification Middleware"]
+A secure upload pipeline should validate allowed file types, enforce size limits, generate safe server-side filenames, and prevent path traversal.
 
-        subgraph CoreEngines ["Core Engines"]
-            Extractor["Document Extractor (Gemini / Fallback)"]
-            ReconEngine["Three-Way Reconciliation Engine"]
-            PolicyEngine["Deterministic Compliance Core (Policy-as-Code)"]
-            ConsistencyEngine["Cross-Document Consistency Scanner"]
-            LedgerEngine["SHA-256 Audit Ledger Service"]
-        end
+The original documentation specifies a 15 MB upload ceiling and support for PDF, PNG, and JPEG files.
 
-        subgraph Adapters ["13 Statutory Verification Adapters"]
-            GSTN["GSTN Adapter"]
-            PAN["PAN Adapter"]
-            Udyam["Udyam MSME Adapter"]
-            Debar["Central Debarment Adapter"]
-            MII["Make in India Adapter"]
-            Others["EPFO / ESIC / MCA21 / DigiLocker"]
-        end
+### Role-Based Access Control
 
-        DB[("Embedded SQLite / sql.js Database")]
-        Uploads[("Secure Storage /uploads")]
-    end
+Mutating operations should be restricted to authorized roles, such as procurement officers and administrators, with authorization checked on the server.
 
-    UI --> Gateway
-    Dossier --> Gateway
-    Report --> Gateway
-    AuditUI --> Gateway
-    Gateway --> Auth
-    Auth --> Extractor
-    Auth --> ReconEngine
-    Auth --> PolicyEngine
-    Auth --> ConsistencyEngine
-    Auth --> LedgerEngine
-    ReconEngine --> Adapters
-    Extractor --> Uploads
-    PolicyEngine --> DB
-    LedgerEngine --> DB
-```
+### SQL Injection Prevention
+
+Parameterized database queries help prevent untrusted input from being interpreted as executable SQL.
+
+### Input Validation
+
+Structured validation helps ensure that identifiers, request payloads, and decision justifications conform to expected formats.
+
+### Security Best Practices
+
+- Never commit API keys, JWT secrets, passwords, or `.env` files.
+- Validate authorization on the backend rather than relying on frontend controls.
+- Limit upload size and allowed content types.
+- Protect uploaded documents and sensitive procurement information.
+- Use HTTPS for deployed applications.
+- Keep dependencies patched.
+- Avoid logging sensitive document contents or credentials.
+- Perform security testing before handling real procurement data.
 
 ---
 
 ## Technology Stack
 
-- **Frontend**: React 19.0.1, Vite 6.2.3, TypeScript 5.8.2, Tailwind CSS 4.1.14, Lucide React 0.546.0, Recharts 3.10.1, Motion 12.23.24
-- **Backend**: Node.js v24.15.0 (Target: Node 22 Alpine), Bun 1.4.0, Express 4.21.2, TypeScript 5.8.2, esbuild 0.25.0
-- **Database**: SQLite / sql.js 1.14.2 (portable embedded database with disk synchronization)
-- **AI & Extraction**: Google GenAI SDK 2.4.0 (`@google/genai`) with offline deterministic fallback
-- **Validation**: Zod 4.5.4
-- **Containerization**: Docker (multi-stage `oven/bun:1` builder + `node:22-alpine` runner)
-- **Deployment**: Render Web Service (`render.yaml`)
+The original project README identifies the following technologies. Verify the installed versions in `package.json` and the lockfile.
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Frontend | React 19 | User interface |
+| Build tooling | Vite 6 | Frontend development and build |
+| Language | TypeScript | Type safety across the application |
+| Styling | Tailwind CSS 4 | Interface styling |
+| Icons | Lucide React | Interface icons |
+| Charts | Recharts | Data visualization |
+| Motion | Motion | UI animation |
+| Backend | Node.js | JavaScript runtime |
+| API framework | Express 4 | HTTP endpoints and middleware |
+| Database | SQLite / sql.js | Embedded data persistence |
+| AI integration | Google GenAI SDK | Configured AI-assisted extraction |
+| Validation | Zod | Schema and input validation |
+| Bundling | esbuild | Server-side build |
+| Package tooling | Bun / npm | Dependency management and scripts |
+| Containerization | Docker | Reproducible application packaging |
+| Deployment | Render configuration | Cloud deployment setup |
+
+---
+
+## System Architecture
+
+The documented architecture separates the React frontend, Express backend, business logic, verification adapters, database, and document storage.
+
+```mermaid
+flowchart TB
+    subgraph Frontend["Frontend - React and Vite"]
+        A["Procurement Dashboard"]
+        B["Bidder Dossier"]
+        C["Compliance Reports"]
+        D["Audit Ledger View"]
+    end
+
+    subgraph Backend["Backend - Express and TypeScript"]
+        E["API Routes and Middleware"]
+        F["Authentication and Authorization"]
+        G["Document Extraction"]
+        H["Reconciliation Engine"]
+        I["Policy Evaluation Engine"]
+        J["Audit Ledger Service"]
+        K["Verification Adapters"]
+    end
+
+    subgraph Storage["Data and Storage"]
+        L[("SQLite / sql.js")]
+        M[("Uploaded Documents")]
+    end
+
+    A --> E
+    B --> E
+    C --> E
+    D --> E
+    E --> F
+    F --> G
+    F --> H
+    F --> I
+    F --> J
+    H --> K
+    G --> M
+    I --> L
+    J --> L
+```
+
+### Architecture Responsibilities
+
+- **Frontend:** Displays procurement information, findings, evidence, and reports.
+- **API layer:** Receives requests and coordinates backend operations.
+- **Authorization middleware:** Checks whether the requesting user is permitted to perform an operation.
+- **Extraction service:** Processes supported documents and identifies candidate information.
+- **Reconciliation engine:** Compares requirements, bidder evidence, and verification results.
+- **Policy engine:** Applies configured compliance rules and scoring.
+- **Verification adapters:** Encapsulate the logic for individual verification sources.
+- **Database:** Stores supported application records and audit data.
+- **Document storage:** Holds uploaded files according to the configured storage implementation.
 
 ---
 
 ## Repository Structure
 
-```
-satyam/
-├── apps/                    # Microservice applications & API controllers
-├── data/                    # Seed data & SQLite procurement database
-├── docs/                    # Architecture, security audit, benchmarks, & screenshots
-│   ├── audit/               # Baseline, test reports, AI audit, and performance benchmarks
-│   └── screenshots/         # 8 verified high-DPI application captures
-├── packages/                # Monorepo workspace packages
-│   ├── compliance-core/     # Deterministic Policy-as-Code evaluation rules & scoring
-│   ├── config/              # Shared configuration tokens
-│   ├── shared-types/        # Domain TypeScript definitions (Tender, Bid, Checks)
-│   └── validation/          # Strict Zod domain validation schemas
-├── public/                  # Public assets & transparent vector State Emblem of India
-├── scripts/                 # Screenshot capture utility & automated UI flow tests
-├── server/                  # Express API server, routes, database, and engines
-│   ├── ai/                  # AI provider abstraction & extraction pipeline
-│   ├── integrations/        # 13 statutory registry verification adapters
-│   └── observability/       # Structured Pino logging & audit verification
-├── src/                     # React 19 single-page application
-│   ├── components/          # Command center, dossier, reports, and ledger views
-│   └── lib/                 # Frontend API client
-├── tests/                   # Automated test suites (82 test cases across 8 suites)
-├── Dockerfile               # Multi-stage reproducible production Docker build
-├── render.yaml              # Render Cloud deployment manifest
-├── package.json             # Root dependency & script manifest
-└── bun.lock                 # Deterministic dependency lockfile
+The original project documentation describes a structure similar to the following. Treat it as a reference and compare it with the actual repository before relying on every path.
+
+```text
+TENDER-GUARD-AI/
+├── apps/                       # Application and API modules
+├── data/                       # Seed data and database assets
+├── docs/
+│   ├── audit/                  # Test and performance reports
+│   └── screenshots/            # Application screenshots
+├── packages/
+│   ├── compliance-core/        # Compliance rules and scoring
+│   ├── config/                 # Shared configuration
+│   ├── shared-types/           # Shared TypeScript types
+│   └── validation/             # Validation schemas
+├── public/                     # Public assets
+├── scripts/                    # Utility and test scripts
+├── server/
+│   ├── ai/                     # AI provider and extraction logic
+│   ├── integrations/           # Verification adapters
+│   └── observability/          # Logging and audit verification
+├── src/
+│   ├── components/             # Frontend components
+│   └── lib/                    # API client and utilities
+├── tests/                      # Automated tests
+├── Dockerfile                  # Container build
+├── render.yaml                 # Render configuration
+├── package.json                # Dependencies and scripts
+├── bun.lock                    # Bun dependency lockfile
+├── .env.example                # Environment variable template
+└── README.md                   # Project documentation
 ```
 
 ---
 
-## Installation & Local Setup
+## Installation and Local Setup
 
 ### Prerequisites
-- **Node.js**: v20.x or v22.x or v24.x
-- **Bun**: v1.1+ (Recommended) or **npm**: v10+
 
-### Step-by-Step Setup
+Install the following software:
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/maitray-agrawal/Satyam.git
-   cd Satyam
-   ```
+- Node.js, using a version supported by the project's dependencies.
+- Bun, if using the documented Bun commands, or npm.
+- Git.
+- Visual Studio Code or another code editor.
+- Docker, if you want to run the containerized version.
 
-2. **Install Dependencies**:
-   ```bash
-   bun install --frozen-lockfile
-   # or with npm:
-   # npm install
-   ```
+Check your installations:
 
-3. **Configure Environment Variables**:
-   ```bash
-   cp .env.example .env
-   ```
-   *(Note: `GEMINI_API_KEY` is optional; if omitted, SATYAM automatically runs in deterministic fallback mode).*
+```powershell
+node --version
+npm --version
+bun --version
+git --version
+```
 
-4. **Start the Development Server**:
-   ```bash
-   bun run dev
-   # Server runs on http://localhost:3000
-   ```
+If the project does not use Bun on your machine, you can use npm when the dependency configuration supports it.
 
-5. **Access the Application**:
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+### Step 1: Clone Your Repository
+
+```powershell
+git clone https://github.com/sumitk-lab/TENDER-GUARD-AI.git
+cd TENDER-GUARD-AI
+```
+
+If you already have the project locally, open its existing folder instead.
+
+### Step 2: Install Dependencies
+
+Using Bun:
+
+```powershell
+bun install --frozen-lockfile
+```
+
+Or using npm:
+
+```powershell
+npm install
+```
+
+Prefer the package manager and lockfile already established by the project.
+
+### Step 3: Configure Environment Variables
+
+If `.env.example` exists, create a local environment file:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env` and fill in the required configuration values.
+
+Do not publish real credentials or secrets to GitHub.
+
+### Step 4: Start the Development Server
+
+If the project defines the documented development script:
+
+```powershell
+bun run dev
+```
+
+Or, when supported:
+
+```powershell
+npm run dev
+```
+
+### Step 5: Open the Application
+
+The original README specifies port 3000 for the local development server:
+
+http://localhost:3000
+
+If your current configuration uses another port, follow the address displayed in the terminal.
 
 ---
 
-## Testing
+## Environment Configuration
 
-Execute the comprehensive test suite (82 automated tests across 8 suites):
+The original project documentation mentions the following configuration values.
 
-```bash
+| Variable | Purpose |
+|---|---|
+| `PORT` | HTTP server port |
+| `NODE_ENV` | Runtime environment |
+| `GEMINI_API_KEY` | Optional credential for a configured Google Gemini integration |
+| `JWT_SECRET` | Secret used for JWT signing or verification, if implemented |
+
+The exact variable names and requirements must match the current application's configuration.
+
+### Example `.env`
+
+```dotenv
+PORT=3000
+NODE_ENV=development
+GEMINI_API_KEY=
+JWT_SECRET=
+```
+
+This is an illustrative template only. Do not use an empty or weak JWT secret in production if the application requires one.
+
+Never expose secret values in screenshots, logs, source code, or public repositories.
+
+---
+
+## API Health Check
+
+The original README documents a health endpoint at:
+
+```text
+GET /api/health
+```
+
+When the application is running locally, test it using PowerShell:
+
+```powershell
+Invoke-RestMethod http://localhost:3000/api/health
+```
+
+The exact response depends on the implemented health-check handler.
+
+A successful HTTP response can help confirm that the server is reachable. It does not by itself prove that all external integrations, the database, or every application feature is working correctly.
+
+The original documentation also references an audit verification endpoint:
+
+```text
+GET /api/audit-logs/verify
+```
+
+Use these endpoints only after confirming they exist in the current source code.
+
+---
+
+## Testing and Type Checking
+
+Automated tests help detect regressions and verify important application behavior.
+
+### Run Tests
+
+If the corresponding script exists in `package.json`:
+
+```powershell
 bun run test
-# or with npm:
-# npm run test
 ```
 
-### Type Checking
-```bash
+Or:
+
+```powershell
+npm run test
+```
+
+### Run Type Checking
+
+The original project documents:
+
+```powershell
 bun run lint
-# executes: tsc --noEmit
 ```
 
+with the script executing TypeScript validation.
+
+Check `package.json` to confirm that the script is present and that its name matches the current configuration.
+
+### Recommended Testing Areas
+
+- Tender creation and requirement parsing.
+- Document upload validation.
+- Evidence extraction and field normalization.
+- Compliance scoring and mandatory conditions.
+- Exemption handling.
+- Verification adapter behavior.
+- Authorization and role restrictions.
+- Audit ledger integrity.
+- API error handling.
+- Frontend navigation and reporting.
+
+Test results should be reported only after the tests have actually been executed against the current version of the code.
+
 ---
 
-## Docker Build & Run
+## Docker Deployment
 
-The repository includes a multi-stage Docker build that builds the Vite client SPA and server bundle, then runs on a lightweight Node.js 22 Alpine runtime:
+The original README describes a multi-stage Docker build using Bun for the build stage and Node.js Alpine for the runtime.
 
-```bash
-# Build the Docker image
-docker build -t satyam-platform .
+### Build the Docker Image
 
-# Run the container
-docker run -d -p 3000:3000 -e PORT=3000 --name satyam-instance satyam-platform
+Run this command from the directory containing the Dockerfile:
 
-# Verify health status
-curl http://localhost:3000/api/health
+```powershell
+docker build -t tender-guard-ai .
 ```
 
----
+### Start the Container
 
-## Deployment (Render)
+```powershell
+docker run -d -p 3000:3000 -e PORT=3000 --name tender-guard-ai tender-guard-ai
+```
 
-SATYAM is configured for continuous deployment on **Render** via `render.yaml`:
-- **Runtime**: Docker
-- **DockerfilePath**: `./Dockerfile`
-- **Health Check Path**: `/api/health`
-- **Environment Variables**:
-  - `NODE_ENV`: `production`
-  - `PORT`: `3000`
-  - `GEMINI_API_KEY`: *(Optional)*
-  - `JWT_SECRET`: *(Auto-generated)*
+### Check Container Status
 
----
+```powershell
+docker ps
+```
 
-## Limitations & Honest Disclosures
+### Check Application Health
 
-1. **Simulated Registry Adapters**: Government registry integrations (GSTN, PAN, Udyam, Debarment) operate in controlled simulation mode in this demonstration environment. Production deployment requires formal institutional API onboarding with statutory authorities.
-2. **Demonstration Persistence**: Embedded SQLite (`sql.js`) is used for portable demonstration. Multi-instance production deployment requires managed PostgreSQL.
-3. **Ephemeral Container Storage**: On containerized free-tier hosting, file uploads are stored in the container filesystem and reset upon redeployment unless configured with object storage (S3/GCS).
-4. **Human Authority**: SATYAM is strictly an evidence-driven decision-support platform. Under GFR 2017, all statutory awards or rejections remain the sole legal responsibility of the authorized Procurement Officer.
+```powershell
+Invoke-RestMethod http://localhost:3000/api/health
+```
+
+These commands assume the Dockerfile, server port, startup command, and health endpoint are compatible with the original project configuration.
 
 ---
 
-## Production Roadmap
+## Cloud Deployment
 
-- [ ] Transition from embedded SQLite to managed PostgreSQL with connection pooling
-- [ ] Enterprise SSO integration via Jan Parichay / Parichay OAuth2
-- [ ] Live GSTN GSP and NSDL PAN verification REST API onboarding
-- [ ] Distributed asynchronous job queues via Redis / BullMQ for high-volume tender OCR
-- [ ] Long-term cryptographic audit log archival to WORM (Write-Once-Read-Many) storage
+The original README identifies Render as the deployment platform.
+
+If the current repository retains a compatible `render.yaml` and Dockerfile, deployment can be configured through Render.
+
+### General Deployment Steps
+
+1. Push the latest code to your GitHub repository.
+2. Sign in to Render.
+3. Create a new Web Service and connect your repository.
+4. Configure the service to use the appropriate Docker build configuration.
+5. Set the required environment variables in Render's environment settings.
+6. Configure the correct health-check path if supported.
+7. Deploy and inspect the build logs.
+8. Test the deployed application's main workflows.
+
+The deployment URL depends on the Render service actually created for Tender Guard AI. The former SATYAM deployment URL should not be presented as the Tender Guard AI production URL unless the service has been renamed and verified.
+
+### Production Storage Considerations
+
+Uploaded files stored only on an ephemeral container filesystem may disappear when a service is redeployed or restarted. A production deployment should use an appropriate persistent storage strategy.
+
+Similarly, an embedded SQLite database may be suitable for a demonstration but may require a different persistence and concurrency architecture for a larger deployment.
 
 ---
 
-## Team
+## Limitations and Disclosures
 
-- **Maitray Agrawal** — Team Lead & Full-Stack Architect
-- **Smart India Hackathon 2026** — Participating Team
+### 1. Simulated Verification
+
+The original project describes government registry adapters that operate in simulation mode. Such adapters demonstrate the intended workflow but do not independently verify real government records.
+
+### 2. Production Integrations
+
+Live registry verification requires authorized access, appropriate credentials, compatible APIs, and formal integration work.
+
+### 3. Data Persistence
+
+Embedded SQLite and local file storage may be appropriate for demonstrations but require further evaluation for production use, backups, concurrency, and long-term retention.
+
+### 4. AI Extraction Accuracy
+
+AI-assisted extraction may misread, omit, or incorrectly interpret information. Important findings need supporting evidence and appropriate review.
+
+### 5. Security and Privacy
+
+Tender dossiers may contain confidential business, financial, or identity information. Production deployments need appropriate access controls, secure storage, retention policies, and data-protection measures.
+
+### 6. Human Decision Authority
+
+Tender Guard AI is a decision-support concept. Final procurement decisions must follow the applicable rules and remain with the authorized decision-makers.
+
+### 7. Performance Claims
+
+Any claims regarding test pass rates, latency, supported document volumes, or processing accuracy should be backed by reproducible tests and measurements from the current codebase.
 
 ---
 
-## SIH Resources
+## Future Enhancements
 
-- **Problem Statement**: SIH26100 (Ministry of Commerce & Industry / GeM)
-- **Technical Architecture**: [docs/architecture.md](./docs/architecture.md)
-- **Security Audit**: [docs/security-audit.md](./docs/security-audit.md)
-- **Performance Benchmark**: [docs/audit/performance.md](./docs/audit/performance.md)
-- **Test Execution Report**: [docs/audit/test-report.md](./docs/audit/test-report.md)
+Potential future improvements include:
+
+- [ ] Integration with authorized live government verification services.
+- [ ] Managed PostgreSQL for production data persistence.
+- [ ] Enterprise single sign-on and stronger identity management.
+- [ ] Asynchronous processing for large document collections.
+- [ ] Improved OCR for scanned and multilingual documents.
+- [ ] Configurable procurement policy versions.
+- [ ] More comprehensive compliance explanation and evidence views.
+- [ ] External or immutable audit-log archival.
+- [ ] Automated regression and security testing.
+- [ ] Monitoring, alerting, and operational dashboards.
+- [ ] Improved document retention and privacy controls.
+- [ ] Performance benchmarking under realistic workloads.
+
+These are proposed enhancements, not claims that the features are already implemented.
+
+---
+
+## Contributing
+
+Contributions that improve reliability, usability, accessibility, security, documentation, and testing are welcome.
+
+### Suggested Contribution Workflow
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Implement your change.
+4. Run the relevant tests and type checks.
+5. Review your changes for security and unintended behavior.
+6. Commit your work with a descriptive message.
+7. Open a pull request describing the changes and validation performed.
+
+Example:
+
+```powershell
+git checkout -b feature/improve-compliance-report
+git add .
+git commit -m "Improve compliance report"
+git push -u origin feature/improve-compliance-report
+```
+
+Do not include real bidder data, credentials, or sensitive documents in commits or test fixtures.
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
-#   T E N D E R - G U A R D - A I  
- 
+This project references the MIT License in its original documentation.
+
+Retain the MIT license badge and this section only if the current repository includes the applicable `LICENSE` file and the project is actually distributed under that license.
+
+---
+
+## Acknowledgements
+
+Tender Guard AI is based on the idea of improving transparency, consistency, and evidence traceability in public procurement.
+
+The project draws on the concepts of policy-as-code, AI-assisted document processing, structured validation, and human-in-the-loop decision support.
+
+**Tender Guard AI — Making procurement compliance more transparent, traceable, and consistent.**
+
+---
+
+*Documentation note: This README uses the original project's documentation as its technical baseline. Verify the repository structure, dependency versions, endpoints, tests, integrations, license, and deployment configuration before presenting them as confirmed properties of the renamed project.*
